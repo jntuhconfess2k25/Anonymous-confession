@@ -6,129 +6,130 @@
 <title>Anonymous Confession</title>
 
 <style>
-  * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: radial-gradient(circle at top, #111, #000);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #eaeaea;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    overflow: hidden;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #121217, #000);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #eaeaea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
 
-  .container {
-    width: 100%;
-    max-width: 520px;
-    background: #0f1114;
-    border-radius: 16px;
-    padding: 26px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-    text-align: center;
-    position: relative;
-  }
+/* ---------- CARD ---------- */
+.container {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(15,17,20,0.85);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 30px 26px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
 
-  h1 {
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
-  }
+h1 {
+  font-size: 19px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  letter-spacing: 0.6px;
+}
 
-  p.note {
-    font-size: 13px;
-    color: #9aa0a6;
-    margin-bottom: 18px;
-  }
+p.note {
+  font-size: 13px;
+  color: #9aa0a6;
+  margin-bottom: 22px;
+}
 
-  textarea {
-    width: 100%;
-    min-height: 160px;
-    background: #090b0e;
-    border: 1px solid #222;
-    border-radius: 12px;
-    color: #f5f5f5;
-    padding: 14px;
-    font-size: 14px;
-    resize: none;
-    outline: none;
-    text-align: left;
-    transition: transform 0.3s ease;
-  }
+/* ---------- TEXTAREA ---------- */
+textarea {
+  width: 100%;
+  min-height: 170px;
+  background: #0a0c10;
+  border: 1px solid #1f1f26;
+  border-radius: 14px;
+  color: #f5f5f5;
+  padding: 16px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  line-height: 1.6;
+}
 
-  textarea:disabled {
-    opacity: 0.4;
-  }
+textarea::placeholder {
+  color: #6f7480;
+}
 
-  button {
-    margin-top: 18px;
-    width: 100%;
-    padding: 13px;
-    font-size: 14px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    color: #fff;
-    background: linear-gradient(135deg, #7f5cff, #ff5ca8, #111);
-    background-size: 200% 200%;
-    animation: gradientMove 6s ease infinite;
-    transition: transform 0.3s ease;
-  }
+textarea:disabled {
+  opacity: 0.35;
+}
 
-  button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+/* ---------- BUTTON ---------- */
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4d4d, #4d79ff, #00ffd5, #000);
+  background-size: 300% 300%;
+  animation: gradientMove 7s ease infinite;
+  transition: transform 0.25s ease;
+}
 
-  @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+button:active {
+  transform: scale(0.97);
+}
 
-  #status {
-    margin-top: 16px;
-    font-size: 13px;
-    min-height: 20px;
-    color: #b0b6bb;
-  }
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
-  .closed {
-    color: #ff6b6b;
-  }
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-  .success {
-    color: #7cffb2;
-    animation: pop 0.6s ease;
-  }
+/* ---------- STATUS ---------- */
+#status {
+  margin-top: 16px;
+  font-size: 13px;
+  min-height: 20px;
+  color: #b0b6bb;
+}
 
-  @keyframes pop {
-    0% { transform: scale(0.7); opacity: 0; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
+.closed { color: #ff6b6b; }
 
-  .confetti {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: #ff5ca8;
-    top: 0;
-    left: 50%;
-    pointer-events: none;
-    opacity: 0.9;
-    border-radius: 50%;
-    animation: fall 1s linear forwards;
-  }
+.success {
+  color: #7cffb2;
+  animation: pop 0.6s ease;
+}
 
-  @keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(150px) rotate(720deg); opacity: 0; }
-  }
+@keyframes pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- FALLING PARTICLES ---------- */
+canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
 </style>
 </head>
 
@@ -146,13 +147,15 @@
   <div id="status"></div>
 </div>
 
+<canvas id="particles"></canvas>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, serverTimestamp } 
 from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* 🔴 Manual Open/Close */
-const OPEN = true; // true=open, false=closed
+const OPEN = true;
 
 const firebaseConfig = {
   apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
@@ -168,8 +171,8 @@ const textInput = document.getElementById("confessionText");
 const status = document.getElementById("status");
 const btn = document.getElementById("submitBtn");
 const note = document.getElementById("note");
-const container = document.querySelector('.container');
 
+/* ---------- OPEN / CLOSE ---------- */
 if (!OPEN) {
   textInput.disabled = true;
   btn.disabled = true;
@@ -180,18 +183,48 @@ if (!OPEN) {
   note.innerText = "Submissions are open.";
 }
 
-function createConfetti() {
-  for (let i = 0; i < 20; i++) {
-    const confetti = document.createElement('div');
-    confetti.classList.add('confetti');
-    confetti.style.left = `${Math.random() * 100}%`;
-    confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
-    confetti.style.animationDuration = `${0.8 + Math.random()*0.7}s`;
-    container.appendChild(confetti);
-    setTimeout(() => confetti.remove(), 1500);
-  }
+/* ---------- FALLING PARTICLES ---------- */
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+let particles = [];
+let started = false;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+function initParticles() {
+  particles = Array.from({ length: 80 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 1,
+    s: Math.random() * 0.6 + 0.4,
+    h: Math.random() * 360,
+    o: Math.random() * 0.5 + 0.3
+  }));
 }
 
+function animateParticles() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = `hsla(${p.h},80%,60%,${p.o})`;
+    ctx.fill();
+    p.y += p.s;
+    p.h += 0.7;
+    if (p.y > canvas.height) {
+      p.y = 0;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+/* ---------- SUBMIT ---------- */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!OPEN) return;
@@ -207,22 +240,31 @@ form.addEventListener("submit", async (e) => {
 
   try {
     const now = new Date();
-    const docID = `${now.getDate().toString().padStart(2,'0')}${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}`;
-    const docRef = doc(db, "confessions", docID);
-    await setDoc(docRef, {
-      text: text,
+    const docID =
+      `${now.getDate().toString().padStart(2,'0')}` +
+      `${(now.getMonth()+1).toString().padStart(2,'0')}-` +
+      `${now.getHours().toString().padStart(2,'0')}` +
+      `${now.getMinutes().toString().padStart(2,'0')}` +
+      `${now.getSeconds().toString().padStart(2,'0')}`;
+
+    await setDoc(doc(db, "confessions", docID), {
+      text,
       createdAt: serverTimestamp()
     });
 
     status.innerText = "✔ Confession submitted!";
     status.classList.add("success");
     textInput.value = "";
-    createConfetti();
+
+    if (!started) {
+      started = true;
+      initParticles();
+      animateParticles();
+    }
 
     setTimeout(() => location.reload(), 1000);
 
-  } catch (err) {
-    console.error(err);
+  } catch {
     status.innerText = "Submission failed.";
   }
 

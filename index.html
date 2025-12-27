@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anonymous Confession</title>
+
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #111, #000);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #eaeaea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    background: #0f1114;
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    text-align: center;
+    position: relative;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  p.note {
+    font-size: 13px;
+    color: #9aa0a6;
+    margin-bottom: 18px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    background: #090b0e;
+    border: 1px solid #222;
+    border-radius: 12px;
+    color: #f5f5f5;
+    padding: 14px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    text-align: left;
+    transition: transform 0.3s ease;
+  }
+
+  textarea:disabled {
+    opacity: 0.4;
+  }
+
+  button {
+    margin-top: 18px;
+    width: 100%;
+    padding: 13px;
+    font-size: 14px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, #7f5cff, #ff5ca8, #111);
+    background-size: 200% 200%;
+    animation: gradientMove 6s ease infinite;
+    transition: transform 0.3s ease;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  #status {
+    margin-top: 16px;
+    font-size: 13px;
+    min-height: 20px;
+    color: #b0b6bb;
+  }
+
+  .closed {
+    color: #ff6b6b;
+  }
+
+  .success {
+    color: #7cffb2;
+    animation: pop 0.6s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #ff5ca8;
+    top: 0;
+    left: 50%;
+    pointer-events: none;
+    opacity: 0.9;
+    border-radius: 50%;
+    animation: fall 1s linear forwards;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(150px) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Anonymous Confession</h1>
+  <p class="note" id="note"></p>
+
+  <form id="confessionForm">
+    <textarea id="confessionText" placeholder="Type what you carry inside..."></textarea>
+    <button type="submit" id="submitBtn">Release</button>
+  </form>
+
+  <div id="status"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+/* 🔴 Manual Open/Close */
+const OPEN = true; // true=open, false=closed
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
+  authDomain: "jntuhconfess2k25.firebaseapp.com",
+  projectId: "jntuhconfess2k25"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const form = document.getElementById("confessionForm");
+const textInput = document.getElementById("confessionText");
+const status = document.getElementById("status");
+const btn = document.getElementById("submitBtn");
+const note = document.getElementById("note");
+const container = document.querySelector('.container');
+
+if (!OPEN) {
+  textInput.disabled = true;
+  btn.disabled = true;
+  note.innerText = "Submissions are currently closed.";
+  status.innerText = "Please check back later.";
+  status.classList.add("closed");
+} else {
+  note.innerText = "Submissions are open.";
+}
+
+function createConfetti() {
+  for (let i = 0; i < 20; i++) {
+    const confetti = document.createElement('div');
+    confetti.classList.add('confetti');
+    confetti.style.left = `${Math.random() * 100}%`;
+    confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
+    confetti.style.animationDuration = `${0.8 + Math.random()*0.7}s`;
+    container.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 1500);
+  }
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!OPEN) return;
+
+  const text = textInput.value.trim();
+  if (!text) {
+    status.innerText = "Write something first.";
+    return;
+  }
+
+  btn.disabled = true;
+  status.innerText = "Encrypting & sending...";
+
+  try {
+    const now = new Date();
+    const docID = `${now.getDate().toString().padStart(2,'0')}${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}`;
+    const docRef = doc(db, "confessions", docID);
+    await setDoc(docRef, {
+      text: text,
+      createdAt: serverTimestamp()
+    });
+
+    status.innerText = "✔ Confession submitted!";
+    status.classList.add("success");
+    textInput.value = "";
+    createConfetti();
+
+    setTimeout(() => location.reload(), 1000);
+
+  } catch (err) {
+    console.error(err);
+    status.innerText = "Submission failed.";
+  }
+
+  btn.disabled = false;
+});
+</script>
+
+</body>
+</html>

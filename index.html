@@ -131,15 +131,6 @@ button:disabled {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* ---------- ADS ---------- */
-.ads-box {
-  margin-top: 26px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  text-align: center;
-  opacity: 0.9;
-}
-
 /* ---------- PARTICLES ---------- */
 canvas {
   position: fixed;
@@ -153,24 +144,16 @@ canvas {
 <body>
 
 <div class="container">
-  <h1>JNTUH CONFESSIONS🏫</h1>
-  <div class="tagline">Your Confession is Encrypted and PRIVATE🔒.</div>
+  <h1>JNTUH CONFESSIONS 🏫</h1>
+  <div class="tagline">Your confession is encrypted & private 🔒</div>
   <div class="note" id="note"></div>
 
   <form id="confessionForm">
-    <textarea id="confessionText" placeholder="Confess anonymously 🤫...."></textarea>
-    <button type="submit" id="submitBtn">Submit📨</button>
+    <textarea id="confessionText" placeholder="Confess anonymously 🤫..."></textarea>
+    <button type="submit" id="submitBtn">Submit 📨</button>
   </form>
 
   <div id="status"></div>
-
-  <!-- ADS BOX -->
-  <div class="ads-box">
-    <script async="async" data-cfasync="false"
-      src="https://pl28344884.effectivegatecpm.com/54c3f4e0a27dd6be7c54837ac50c66bc/invoke.js">
-    </script>
-    <div id="container-54c3f4e0a27dd6be7c54837ac50c66bc"></div>
-  </div>
 </div>
 
 <canvas id="particles"></canvas>
@@ -181,7 +164,7 @@ import { getFirestore, doc, setDoc, serverTimestamp }
 from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 /* 🔴 MANUAL OPEN / CLOSE */
-const OPEN = true;
+const OPEN = true; // true = open | false = closed
 
 const firebaseConfig = {
   apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
@@ -202,11 +185,11 @@ const note = document.getElementById("note");
 if (!OPEN) {
   textInput.disabled = true;
   btn.disabled = true;
-  note.innerText = "Submissions are currently closed.🤒";
-  status.innerText = "Please check back 🤕 later.";
+  note.innerText = "Submissions are currently closed 🤒";
+  status.innerText = "Please check back later 🤕";
   status.classList.add("closed");
 } else {
-  note.innerText = "🙊It's only me reading,Feel free to share your thoughts or confessions; there's nothing to worry about. You are completely anonymous here.👀";
+  note.innerText = "🙊It's only me reading,Feel free to share your thoughts or confessions; there's nothing to worry about. You are completely anonymous here.💯";
 }
 
 /* ---------- PARTICLES ---------- */

@@ -92,11 +92,6 @@ button {
   background: linear-gradient(135deg, #ff4d4d, #4d79ff, #00ffd5, #000);
   background-size: 300% 300%;
   animation: gradientMove 7s ease infinite;
-  transition: transform 0.25s ease;
-}
-
-button:active {
-  transform: scale(0.97);
 }
 
 button:disabled {
@@ -108,6 +103,15 @@ button:disabled {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* ---------- RULES LINK ---------- */
+.rules-link {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8aa2ff;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 /* ---------- STATUS ---------- */
@@ -138,6 +142,60 @@ canvas {
   z-index: 1;
   pointer-events: none;
 }
+
+/* ---------- RULES MODAL ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background: #0e1014;
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.9);
+  animation: fadeUp 0.4s ease;
+}
+
+.modal-content h2 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.modal-content ul {
+  font-size: 13px;
+  color: #cfd3ff;
+  text-align: left;
+  line-height: 1.7;
+  padding-left: 18px;
+}
+
+.modal-content li {
+  margin-bottom: 8px;
+}
+
+.close-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg,#ff4d4d,#4d79ff);
+  color: #fff;
+  cursor: pointer;
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 </style>
 </head>
 
@@ -153,18 +211,34 @@ canvas {
     <button type="submit" id="submitBtn">Submit 📨</button>
   </form>
 
+  <div class="rules-link" id="openRules">📜 Read Rules</div>
   <div id="status"></div>
 </div>
 
 <canvas id="particles"></canvas>
+
+<!-- RULES MODAL -->
+<div class="modal" id="rulesModal">
+  <div class="modal-content">
+    <h2>Confession Rules ⚠️</h2>
+    <ul>
+      <li>🚫 Do NOT mention real names.</li>
+      <li>🔒 If names are detected, they will be hidden with <b>*</b>.</li>
+      <li>❌ No abuses, vulgar or sexual content.</li>
+      <li>🛑 Such confessions will be rejected.</li>
+      <li>👀 All confessions are manually reviewed by me.</li>
+    </ul>
+    <button class="close-btn" id="closeRules">Got it 👍</button>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getFirestore, doc, setDoc, serverTimestamp }
 from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-/* 🔴 MANUAL OPEN / CLOSE */
-const OPEN = true; // true = open | false = closed
+/* 🔴 OPEN / CLOSE */
+const OPEN = true;
 
 const firebaseConfig = {
   apiKey: "AIzaSyBG5Z71bIS4HA-0y5477uDKCxHgDkWaO_I",
@@ -185,100 +259,72 @@ const note = document.getElementById("note");
 if (!OPEN) {
   textInput.disabled = true;
   btn.disabled = true;
-  note.innerText = "Submissions are currently closed 🤒";
-  status.innerText = "Please check back later 🤕";
+  note.innerText = "Submissions are closed 🤒";
   status.classList.add("closed");
 } else {
-  note.innerText = "🙊It's only me reading,Feel free to share your thoughts or confessions; there's nothing to worry about. You are completely anonymous here.💯";
+  note.innerText = "🙊 Only me reading 👀";
 }
 
 /* ---------- PARTICLES ---------- */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
-let particles = [];
-let started = false;
+let particles = [], started = false;
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 function initParticles() {
   particles = Array.from({ length: 80 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2 + 1,
-    s: Math.random() * 0.6 + 0.4,
-    h: Math.random() * 360,
-    o: Math.random() * 0.5 + 0.3
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*2+1,
+    s: Math.random()*0.6+0.4,
+    h: Math.random()*360,
+    o: Math.random()*0.5+0.3
   }));
 }
 
 function animateParticles() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p => {
+  particles.forEach(p=>{
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = `hsla(${p.h},80%,60%,${p.o})`;
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`hsla(${p.h},80%,60%,${p.o})`;
     ctx.fill();
-    p.y += p.s;
-    p.h += 0.7;
-    if (p.y > canvas.height) {
-      p.y = 0;
-      p.x = Math.random() * canvas.width;
-    }
+    p.y+=p.s; p.h+=0.7;
+    if(p.y>canvas.height){p.y=0;p.x=Math.random()*canvas.width;}
   });
   requestAnimationFrame(animateParticles);
 }
 
 /* ---------- SUBMIT ---------- */
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async e=>{
   e.preventDefault();
-  if (!OPEN) return;
+  if(!OPEN) return;
 
-  const text = textInput.value.trim();
-  if (!text) {
-    status.innerText = "Write something first.";
-    return;
-  }
+  const text=textInput.value.trim();
+  if(!text){status.innerText="Write something first.";return;}
 
-  btn.disabled = true;
-  status.innerText = "Encrypting & sending...";
+  btn.disabled=true;
+  status.innerText="Encrypting & sending...";
 
-  try {
-    const now = new Date();
-    const docID =
-      `${now.getDate().toString().padStart(2,'0')}` +
-      `${(now.getMonth()+1).toString().padStart(2,'0')}-` +
-      `${now.getHours().toString().padStart(2,'0')}` +
-      `${now.getMinutes().toString().padStart(2,'0')}` +
-      `${now.getSeconds().toString().padStart(2,'0')}`;
+  const now=new Date();
+  const id=`${now.getDate().toString().padStart(2,'0')}${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}${now.getSeconds().toString().padStart(2,'0')}`;
 
-    await setDoc(doc(db, "confessions", docID), {
-      text,
-      createdAt: serverTimestamp()
-    });
+  await setDoc(doc(db,"confessions",id),{text,createdAt:serverTimestamp()});
 
-    status.innerText = "✔ Confession submitted!";
-    status.classList.add("success");
-    textInput.value = "";
+  status.innerText="✔ Confession submitted!";
+  status.classList.add("success");
+  textInput.value="";
 
-    if (!started) {
-      started = true;
-      initParticles();
-      animateParticles();
-    }
-
-    setTimeout(() => location.reload(), 1000);
-
-  } catch {
-    status.innerText = "Submission failed.";
-  }
-
-  btn.disabled = false;
+  if(!started){started=true;initParticles();animateParticles();}
+  setTimeout(()=>location.reload(),1000);
 });
+
+/* ---------- RULES POPUP ---------- */
+const modal=document.getElementById("rulesModal");
+document.getElementById("openRules").onclick=()=>modal.style.display="flex";
+document.getElementById("closeRules").onclick=()=>modal.style.display="none";
 </script>
 
 </body>
